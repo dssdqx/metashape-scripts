@@ -201,5 +201,5 @@ def run_camera_alignment():
         chunk)
     align_cameras(chunk, min_latitude, min_longitude)
 
-
 Metashape.app.addMenuItem("🛠 GIS scripts/Vertical Camera Alignment [quick_layout.py]", run_camera_alignment)
+# 
