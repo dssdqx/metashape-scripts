@@ -1,12 +1,5 @@
 import Metashape
 
-# Checking compatibility
-compatible_major_version = "2.0"
-found_major_version = ".".join(Metashape.app.version.split('.')[:2])
-if found_major_version != compatible_major_version:
-    raise Exception("Incompatible Metashape version: {} != {}".format(
-        found_major_version, compatible_major_version))
-
 
 def add_altitude():
     """
@@ -33,4 +26,4 @@ def add_altitude():
 
 label = "🛠 GIS scripts/XYZ Shift [add_shift_xyz_frame.py]"
 Metashape.app.addMenuItem(label, add_altitude)
-print("To execute this script press {}".format(label))
+
