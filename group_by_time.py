@@ -69,11 +69,11 @@ def main():
     photo_time = {}   # фото и gps time 
 
     for camera in chunk.cameras:
-        if camera.photo:  # Проверяем, есть ли фото у камеры
+        if camera.photo:  
             photo = os.path.basename(camera.photo.path)
             gps_time = camera.photo.meta["Exif/GPSTime"]
 
-            if gps_time == None:                                            # в EXIF камеры типа M4E нет тега GPSTime, версию я не понял как отлавливать 
+            if gps_time == None:                                            # в EXIF камеры типа M4E нет тега GPSTime
                 gps_time = camera.photo.meta["Exif/DateTime"]
                 date_part, time_part = gps_time.split()
                 parsed_time = datetime.strptime(time_part, "%H:%M:%S").time()

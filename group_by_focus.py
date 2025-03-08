@@ -26,7 +26,7 @@ def export_raw_file(exif_columns: str, folder: str):
             parts = cleaned_line.split('\t')
 
             if len(parts) < 2:
-                continue    # пропускаем
+                continue    
 
             if parts[0] == 'out.txt':
                 continue
@@ -91,11 +91,10 @@ def main():
                     #new_sensor.resolution = current_sensor.resolution 
                     new_sensor.calibration = current_sensor.calibration
 
-            #Назначаем камеру в соответствующий сенсор
+            # Назначаем камеру в соответствующий сенсор
             camera.sensor = focus_sensors[focus_value]
 
     #print(focus_sensors)
-
 
 
 Metashape.app.addMenuItem("🛠 GIS scripts/FocusGroup [group_by_focus.py]", main)
