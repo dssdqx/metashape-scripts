@@ -19,3 +19,10 @@ Grouping photos in the **calibration menu** by missions.
 
 ### `quick_layout.py`
 Alignment of **unaligned photos** (when there are few tie points).
+
+---
+
+### `m_thinning.py`
+Thinning the photo by value.
+
+
