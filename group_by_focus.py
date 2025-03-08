@@ -2,6 +2,8 @@ import Metashape
 import os
 import subprocess
 
+# для работы установите в path exiftool.exe (https://exiftool.org/)
+# Metashape version 2.0 or later
 
 exif_tags = [
     "-filename",

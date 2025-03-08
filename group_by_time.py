@@ -2,6 +2,7 @@ import Metashape
 import os
 from datetime import datetime
 
+# Metashape version 2.0 or later
 
 def group_by_time(photo_time: dict, chunk):
 
