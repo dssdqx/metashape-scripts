@@ -88,3 +88,5 @@ def main():
     group_by_time(sorted_photo_time, chunk, time_cut)
 
 Metashape.app.addMenuItem("🛠 GIS scripts/TimeGroup [group_by_time.py]", main)
+
+
