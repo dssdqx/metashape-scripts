@@ -2,35 +2,34 @@ import Metashape
 import os
 from datetime import datetime
 
-# Metashape version 2.0 or later
 
-def group_by_time(photo_time: dict, chunk):
+d_time_cut = 12  # пороговое значение времени в сек для группировки фото по миссиям
+
+custom_cameras_time = {'ILX-LR1': 200, 'FC6310' : 200, 'FC6310R' : 20}
+
+
+def group_by_time(photo_time: dict, chunk, time_cut):
 
     prev_time = None
     photo_time_diff = {}
-
-    time_cut = 9  # пороговое значение времени в сек для группировки фото
-
     group = 1  
     photo_calibration_group = {}
 
-    for k, v in photo_time.items():
-        current_time = datetime.combine(datetime.min, v)
-        
+    for photo, time in photo_time.items():
         if prev_time is None:
-            photo_time_diff[k] = 0  # для первого фото разница во времени будет 0
+            photo_time_diff[photo] = 0  # для первого фото разница во времени будет 0
         else:
-            time_diff = (current_time - prev_time).total_seconds()  # в сек разница кадров
-            photo_time_diff[k] = time_diff
-        prev_time = current_time
+            time_diff = (time - prev_time).total_seconds()  # в секундах разница между datatime
+            photo_time_diff[photo] = time_diff
+        prev_time = time  # обновляем prev_time на текущее время
 
-    # Группируем фото по времени
+    # группируем фото по скачкам времени 
     for k, v in photo_time_diff.items():
         if v > time_cut:
             group += 1  # если разница во времени больше порога, новая группа
         photo_calibration_group[k] = group
 
-    time_sensors = {} # группы калибровки тут будут
+    time_sensors = {} # группы калибровки 
 
     for camera in chunk.cameras:
         photo_name = os.path.basename(camera.photo.path)  # имя фото
@@ -60,30 +59,32 @@ def group_by_time(photo_time: dict, chunk):
     for k,v in photo_time.items():
         group = photo_calibration_group.get(k)
         diff = photo_time_diff.get(k)
-        print(f'{k} {v} diff {diff} in {group} group/mission')      
+        print(f'{k} {v} diff {diff} in {group} group/mission') 
 
 
 def main():
     doc = Metashape.app.document
     chunk = doc.chunk
-    photo_time = {}   # фото и gps time 
+    photo_time = {}   # фото и date time 
+    model = set()
 
     for camera in chunk.cameras:
-        if camera.photo:  
+        if camera.photo: 
             photo = os.path.basename(camera.photo.path)
-            gps_time = camera.photo.meta["Exif/GPSTime"]
-
-            if gps_time == None:                                            # в EXIF камеры типа M4E нет тега GPSTime
-                gps_time = camera.photo.meta["Exif/DateTime"]
-                date_part, time_part = gps_time.split()
-                parsed_time = datetime.strptime(time_part, "%H:%M:%S").time()
-                photo_time[photo] = parsed_time
-
+            date_time = camera.photo.meta["Exif/DateTime"]
+            model.add(camera.photo.meta['Exif/Model'])
+            if date_time:
+                parsed_datetime = datetime.strptime(date_time, "%Y:%m:%d %H:%M:%S")
+                photo_time[photo] = parsed_datetime
             else:
-                parsed_time = datetime.strptime(gps_time, "%H:%M:%S").time()
-                photo_time[photo] = parsed_time
+                print('error! EXIF does not contain meta Exif/DateTime\nexit')
 
-    group_by_time(photo_time, chunk)
+    sorted_photo_time = dict(sorted(photo_time.items(), key=lambda x: x[1]))  # сортируем т.к. по умолчанию в мш сортировка по названию фото, буквы -> цифры и не учитывает время создания фото
 
+    if len(model) == 1:
+        camera = next(iter(model)) 
+        time_cut = custom_cameras_time.get(camera, d_time_cut)  # берём значение для разбивки из словаря, если нет то берём по умолчанию 
+
+    group_by_time(sorted_photo_time, chunk, time_cut)
 
 Metashape.app.addMenuItem("🛠 GIS scripts/TimeGroup [group_by_time.py]", main)
